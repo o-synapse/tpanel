@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TermuxPanel — Minecraft Server Manager</title>
+    <title>TermuxPanel — Minecraft 服务端管理器</title>
     <meta name="description" content="Modern Minecraft Server Management Panel for Termux">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,17 +15,18 @@
     <!-- Login Screen -->
     <div id="login-screen" class="login-screen hidden">
         <div class="login-container">
+            <div class="lang-switch lang-switch-corner"></div>
             <div class="login-logo">
                 <div class="login-icon">⛏️</div>
                 <h1>TermuxPanel</h1>
-                <p class="login-subtitle">Minecraft Server Manager</p>
+                <p class="login-subtitle" data-i18n="login.subtitle">Minecraft 服务端管理器</p>
             </div>
             <form id="login-form" class="login-form">
                 <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password" required>
+                    <label for="login-password" data-i18n="login.password">密码</label>
+                    <input type="password" id="login-password" data-i18n-placeholder="login.passwordPlaceholder" placeholder="请输入密码" autocomplete="current-password" required>
                 </div>
-                <button type="submit" class="btn btn-primary btn-full" id="login-btn">Sign In</button>
+                <button type="submit" class="btn btn-primary btn-full" id="login-btn" data-i18n="login.signIn">登录</button>
                 <div id="login-error" class="login-error hidden"></div>
             </form>
         </div>
@@ -34,21 +35,22 @@
     <!-- Setup Screen -->
     <div id="setup-screen" class="login-screen hidden">
         <div class="login-container">
+            <div class="lang-switch lang-switch-corner"></div>
             <div class="login-logo">
                 <div class="login-icon">⛏️</div>
-                <h1>Welcome to TermuxPanel</h1>
-                <p class="login-subtitle">Set up your admin password</p>
+                <h1 data-i18n="setup.welcome">欢迎使用 TermuxPanel</h1>
+                <p class="login-subtitle" data-i18n="setup.subtitle">请设置管理员密码</p>
             </div>
             <form id="setup-form" class="login-form">
                 <div class="form-group">
-                    <label for="setup-password">Create Password</label>
-                    <input type="password" id="setup-password" placeholder="Choose a password" minlength="4" required>
+                    <label for="setup-password" data-i18n="setup.createPassword">创建密码</label>
+                    <input type="password" id="setup-password" data-i18n-placeholder="setup.choosePlaceholder" placeholder="请设置一个密码" minlength="4" required>
                 </div>
                 <div class="form-group">
-                    <label for="setup-confirm">Confirm Password</label>
-                    <input type="password" id="setup-confirm" placeholder="Confirm your password" minlength="4" required>
+                    <label for="setup-confirm" data-i18n="setup.confirmPassword">确认密码</label>
+                    <input type="password" id="setup-confirm" data-i18n-placeholder="setup.confirmPlaceholder" placeholder="再次输入密码" minlength="4" required>
                 </div>
-                <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                <button type="submit" class="btn btn-primary btn-full" data-i18n="setup.createAccount">创建账号</button>
                 <div id="setup-error" class="login-error hidden"></div>
             </form>
         </div>
@@ -73,48 +75,49 @@
             <div class="sidebar-status">
                 <div class="status-indicator" id="sidebar-status-indicator">
                     <span class="status-dot"></span>
-                    <span class="status-text">Offline</span>
+                    <span class="status-text" data-i18n="status.offline">离线</span>
                 </div>
             </div>
 
             <nav class="sidebar-nav">
                 <a href="#dashboard" class="nav-item active" data-page="dashboard">
                     <span class="nav-icon">📊</span>
-                    <span class="nav-label">Dashboard</span>
+                    <span class="nav-label" data-i18n="nav.dashboard">仪表盘</span>
                 </a>
                 <a href="#console" class="nav-item" data-page="console">
                     <span class="nav-icon">💻</span>
-                    <span class="nav-label">Console</span>
+                    <span class="nav-label" data-i18n="nav.console">控制台</span>
                 </a>
                 <a href="#files" class="nav-item" data-page="files">
                     <span class="nav-icon">📁</span>
-                    <span class="nav-label">File Manager</span>
+                    <span class="nav-label" data-i18n="nav.files">文件管理</span>
                 </a>
                 <a href="#jars" class="nav-item" data-page="jars">
                     <span class="nav-icon">☕</span>
-                    <span class="nav-label">JAR Manager</span>
+                    <span class="nav-label" data-i18n="nav.jars">JAR 管理</span>
                 </a>
                 <a href="#properties" class="nav-item" data-page="properties">
                     <span class="nav-icon">⚙️</span>
-                    <span class="nav-label">Server Config</span>
+                    <span class="nav-label" data-i18n="nav.properties">服务端配置</span>
                 </a>
                 <a href="#backups" class="nav-item" data-page="backups">
                     <span class="nav-icon">💾</span>
-                    <span class="nav-label">Backups</span>
+                    <span class="nav-label" data-i18n="nav.backups">备份</span>
                 </a>
                 <a href="#scheduler" class="nav-item" data-page="scheduler">
                     <span class="nav-icon">⏰</span>
-                    <span class="nav-label">Scheduler</span>
+                    <span class="nav-label" data-i18n="nav.scheduler">定时任务</span>
                 </a>
                 <a href="#settings" class="nav-item" data-page="settings">
                     <span class="nav-icon">🔧</span>
-                    <span class="nav-label">Settings</span>
+                    <span class="nav-label" data-i18n="nav.settings">设置</span>
                 </a>
             </nav>
 
             <div class="sidebar-footer">
+                <div class="lang-switch lang-switch-sidebar"></div>
                 <button class="btn btn-ghost btn-sm" id="logout-btn">
-                    <span>🚪</span> Logout
+                    <span>🚪</span> <span data-i18n="nav.logout">退出登录</span>
                 </button>
             </div>
         </aside>
@@ -123,7 +126,10 @@
         <header class="mobile-header" id="mobile-header">
             <button class="hamburger" id="hamburger">☰</button>
             <span class="mobile-title">TermuxPanel</span>
-            <div class="mobile-status" id="mobile-status-dot"></div>
+            <div class="mobile-header-actions">
+                <div class="lang-switch lang-switch-mobile"></div>
+                <div class="mobile-status" id="mobile-status-dot"></div>
+            </div>
         </header>
 
         <!-- Main Content Area -->
@@ -138,19 +144,19 @@
         <nav class="mobile-nav">
             <a href="#dashboard" class="mobile-nav-item active" data-page="dashboard">
                 <span class="mobile-nav-icon">📊</span>
-                <span class="mobile-nav-label">Status</span>
+                <span class="mobile-nav-label" data-i18n="nav.statusShort">状态</span>
             </a>
             <a href="#console" class="mobile-nav-item" data-page="console">
                 <span class="mobile-nav-icon">💻</span>
-                <span class="mobile-nav-label">Console</span>
+                <span class="mobile-nav-label" data-i18n="nav.console">控制台</span>
             </a>
             <a href="#files" class="mobile-nav-item" data-page="files">
                 <span class="mobile-nav-icon">📁</span>
-                <span class="mobile-nav-label">Files</span>
+                <span class="mobile-nav-label" data-i18n="nav.filesShort">文件</span>
             </a>
             <a href="#settings" class="mobile-nav-item" data-page="settings">
                 <span class="mobile-nav-icon">🔧</span>
-                <span class="mobile-nav-label">Settings</span>
+                <span class="mobile-nav-label" data-i18n="nav.settings">设置</span>
             </a>
         </nav>
     </div>
@@ -171,6 +177,7 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/i18n.js"></script>
     <script src="/js/app.js"></script>
 </body>
 </html>
