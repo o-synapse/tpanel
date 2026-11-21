@@ -244,7 +244,7 @@ app.get('/api/auth/status', (req, res) => {
 app.post('/api/auth/setup', async (req, res) => {
     if (config.passwordHash) return res.status(400).json({ error: 'Password already set' });
     const { password } = req.body;
-    if (!password || password.length < 4) return res.status(400).json({ error: 'Password must be at least 4 characters' });
+    if (!password || password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
 
     config.passwordHash = await bcrypt.hash(password, 10);
     saveConfig(config);
@@ -268,7 +268,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/change-password', authMiddleware, async (req, res) => {
     const { currentPassword, newPassword } = req.body;
-    if (!newPassword || newPassword.length < 4) return res.status(400).json({ error: 'New password must be at least 4 characters' });
+    if (!newPassword || newPassword.length < 8) return res.status(400).json({ error: 'New password must be at least 8 characters' });
 
     if (config.passwordHash) {
         const valid = await bcrypt.compare(currentPassword, config.passwordHash);
