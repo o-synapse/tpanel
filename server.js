@@ -322,6 +322,14 @@ app.get('/api/server/console', (req, res) => {
     res.json(consoleBuffer);
 });
 
+// 清空控制台缓冲区（内存），并通过 socket 通知所有已连接客户端同步清空。
+// 只作废当前内存滞留的日志，不会删除磁盘上的任何日志文件。
+app.delete('/api/server/console', (req, res) => {
+    consoleBuffer = [];
+    io.emit('console:clear');
+    res.json({ ok: true });
+});
+
 // ─── Resource Monitoring ─────────────────────────────────────────────────────
 function getSystemStats() {
     const cpus = os.cpus();
