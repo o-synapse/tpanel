@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+node_modules.zip
+
+# Generated configuration and secrets
+config.json
+
+# Runtime data
+minecraft/
+backups/
+.uploads_tmp/
+
+# Logs and editor noise
+*.log
+npm-debug.log*
+.DS_Store

@@ -2,168 +2,453 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TermuxPanel — Minecraft Server Manager</title>
-    <meta name="description" content="Modern Minecraft Server Management Panel for Termux">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#0c0e11">
+    <meta name="description" content="TPanel — a local Minecraft server panel for Termux on Android.">
+    <title>TPanel — Minecraft Server Manager</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23121519'/><path d='M9 11l5 5-5 5' stroke='%23c88355' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M16 21h7' stroke='%23e8eaec' stroke-width='2.6' stroke-linecap='round'/></svg>">
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛏️</text></svg>">
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="login-screen" class="login-screen hidden">
-        <div class="login-container">
-            <div class="login-logo">
-                <div class="login-icon">⛏️</div>
-                <h1>TermuxPanel</h1>
-                <p class="login-subtitle">Minecraft Server Manager</p>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <!-- Shared icon sprite -->
+    <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <symbol id="i-dashboard" viewBox="0 0 24 24">
+            <rect x="3.5" y="3.5" width="7" height="7" rx="1.4"/>
+            <rect x="13.5" y="3.5" width="7" height="7" rx="1.4"/>
+            <rect x="3.5" y="13.5" width="7" height="7" rx="1.4"/>
+            <rect x="13.5" y="13.5" width="7" height="7" rx="1.4"/>
+        </symbol>
+        <symbol id="i-console" viewBox="0 0 24 24">
+            <rect x="3" y="4.5" width="18" height="15" rx="2"/>
+            <path d="M7 9l3 3-3 3M13 15h4"/>
+        </symbol>
+        <symbol id="i-files" viewBox="0 0 24 24">
+            <path d="M3.5 7.5A1.5 1.5 0 0 1 5 6h5l2 2h7a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 19 18H5a1.5 1.5 0 0 1-1.5-1.5z"/>
+        </symbol>
+        <symbol id="i-jar" viewBox="0 0 24 24">
+            <path d="M4 8l8-3.5L20 8l-8 3.5L4 8z"/>
+            <path d="M4 8v8l8 3.5 8-3.5V8"/>
+            <path d="M8 10v4.2l4 1.8"/>
+        </symbol>
+        <symbol id="i-config" viewBox="0 0 24 24">
+            <path d="M6.5 3.5h6l5 5v11a1 1 0 0 1-1 1h-10a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1z"/>
+            <path d="M12.5 3.5v5h5"/>
+            <path d="M8.5 13h6M8.5 16.5h4"/>
+        </symbol>
+        <symbol id="i-backups" viewBox="0 0 24 24">
+            <path d="M4 5.5h16v4H4z"/>
+            <path d="M5.5 9.5v8a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-8"/>
+            <path d="M10 13.5h4"/>
+        </symbol>
+        <symbol id="i-scheduler" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="8"/>
+            <path d="M12 8v4l2.5 2"/>
+        </symbol>
+        <symbol id="i-settings" viewBox="0 0 24 24">
+            <path d="M4 7h5M13 7h7M4 17h9M17 17h3"/>
+            <circle cx="11" cy="7" r="2"/>
+            <circle cx="15" cy="17" r="2"/>
+        </symbol>
+        <symbol id="i-logout" viewBox="0 0 24 24">
+            <path d="M9 5H5.5A1.5 1.5 0 0 0 4 6.5v11A1.5 1.5 0 0 0 5.5 19H9"/>
+            <path d="M15 8.5l3.5 3.5L15 15.5"/>
+            <path d="M10 12h8.5"/>
+        </symbol>
+        <symbol id="i-close" viewBox="0 0 24 24">
+            <path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>
+        </symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24">
+            <path d="M2.8 12S6.3 6.5 12 6.5 21.2 12 21.2 12 17.7 17.5 12 17.5 2.8 12 2.8 12z"/>
+            <circle cx="12" cy="12" r="2.7"/>
+        </symbol>
+        <symbol id="i-eye-off" viewBox="0 0 24 24">
+            <path d="M4 4l16 16"/>
+            <path d="M9.9 5.1A10.6 10.6 0 0 1 12 5c5.7 0 9.2 7 9.2 7a17 17 0 0 1-3 4.1"/>
+            <path d="M6.6 7.2A17 17 0 0 0 2.8 12S6.3 19 12 19a9.6 9.6 0 0 0 3.2-.6"/>
+            <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>
+        </symbol>
+        <symbol id="i-more" viewBox="0 0 24 24">
+            <circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/>
+            <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/>
+            <circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"/>
+        </symbol>
+
+        <!-- Actions -->
+        <symbol id="i-play" viewBox="0 0 24 24">
+            <path d="M8 5.5l10 6.5-10 6.5z"/>
+        </symbol>
+        <symbol id="i-stop" viewBox="0 0 24 24">
+            <rect x="7" y="7" width="10" height="10" rx="1.6"/>
+        </symbol>
+        <symbol id="i-restart" viewBox="0 0 24 24">
+            <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/>
+            <path d="M19.5 4.5v4h-4"/>
+        </symbol>
+        <symbol id="i-power" viewBox="0 0 24 24">
+            <path d="M12 4v8"/>
+            <path d="M7.6 7.1a7 7 0 1 0 8.8 0"/>
+        </symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24">
+            <path d="M4.5 7h15"/>
+            <path d="M9.5 7V5.2A1.2 1.2 0 0 1 10.7 4h2.6a1.2 1.2 0 0 1 1.2 1.2V7"/>
+            <path d="M6.6 7l.8 12a1.5 1.5 0 0 0 1.5 1.4h6.2a1.5 1.5 0 0 0 1.5-1.4l.8-12"/>
+        </symbol>
+        <symbol id="i-download" viewBox="0 0 24 24">
+            <path d="M12 4v11"/>
+            <path d="M7.5 11l4.5 4.5L16.5 11"/>
+            <path d="M5 19.5h14"/>
+        </symbol>
+        <symbol id="i-upload" viewBox="0 0 24 24">
+            <path d="M12 20V9"/>
+            <path d="M7.5 13.5L12 9l4.5 4.5"/>
+            <path d="M5 4.5h14"/>
+        </symbol>
+        <symbol id="i-save" viewBox="0 0 24 24">
+            <path d="M5 4.5h11l3 3v12H5z"/>
+            <path d="M8.5 4.5v5h7v-5"/>
+            <path d="M8 19.5v-5h8v5"/>
+        </symbol>
+        <symbol id="i-eraser" viewBox="0 0 24 24">
+            <path d="M8 20h11"/>
+            <path d="M15.4 4.6 5 15a1.5 1.5 0 0 0 0 2.1l2.4 2.4h4.3l8.3-8.3a1.5 1.5 0 0 0 0-2.1l-2.5-2.4a1.5 1.5 0 0 0-2.1 0z"/>
+            <path d="M9 8.5l6.5 6.5"/>
+        </symbol>
+        <symbol id="i-folder" viewBox="0 0 24 24">
+            <path d="M3.5 7.5A1.5 1.5 0 0 1 5 6h5l2 2h7a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 19 18H5a1.5 1.5 0 0 1-1.5-1.5z"/>
+        </symbol>
+        <symbol id="i-folder-plus" viewBox="0 0 24 24">
+            <path d="M3.5 7.5A1.5 1.5 0 0 1 5 6h5l2 2h7a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 19 18H5a1.5 1.5 0 0 1-1.5-1.5z"/>
+            <path d="M12 11.5v5M9.5 14h5"/>
+        </symbol>
+        <symbol id="i-file" viewBox="0 0 24 24">
+            <path d="M6.5 3.5h6l5 5v11a1 1 0 0 1-1 1h-10a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1z"/>
+            <path d="M12.5 3.5v5h5"/>
+        </symbol>
+        <symbol id="i-box" viewBox="0 0 24 24">
+            <path d="M4 8l8-3.5L20 8v8l-8 3.5L4 16z"/>
+            <path d="M4 8l8 3.5L20 8"/>
+            <path d="M12 11.5v8"/>
+        </symbol>
+        <symbol id="i-server" viewBox="0 0 24 24">
+            <rect x="4" y="4" width="16" height="6.5" rx="1.5"/>
+            <rect x="4" y="13.5" width="16" height="6.5" rx="1.5"/>
+            <path d="M7.5 7.2v.1M7.5 16.7v.1"/>
+        </symbol>
+
+        <!-- Direction and state -->
+        <symbol id="i-arrow-left" viewBox="0 0 24 24">
+            <path d="M14 6l-6 6 6 6"/>
+        </symbol>
+        <symbol id="i-arrow-up" viewBox="0 0 24 24">
+            <path d="M12 19V6"/>
+            <path d="M6.5 11.5L12 6l5.5 5.5"/>
+        </symbol>
+        <symbol id="i-chevron-right" viewBox="0 0 24 24">
+            <path d="M9.5 5.5L16 12l-6.5 6.5"/>
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24">
+            <path d="M12 5v14M5 12h14"/>
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24">
+            <path d="M5 12.5l5 5L19 7"/>
+        </symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24">
+            <path d="M12 4.5l9 15.5H3z"/>
+            <path d="M12 10v4M12 16.5v.5"/>
+        </symbol>
+        <symbol id="i-info" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="8"/>
+            <path d="M12 11v5M12 8v.5"/>
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="8"/>
+            <path d="M12 7.5V12l3 2"/>
+        </symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24">
+            <path d="M20 12a8 8 0 1 1-2.4-5.7"/>
+            <path d="M20 4v4h-4"/>
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+            <rect x="5" y="10.5" width="14" height="9.5" rx="1.6"/>
+            <path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/>
+        </symbol>
+    </svg>
+
+    <!-- Sign In -->
+    <section id="login-screen" class="auth hidden" aria-labelledby="login-title">
+        <aside class="auth-aside" aria-label="About TPanel">
+            <div class="auth-brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="currentColor"/><path d="M9 11.2l5.2 4.8L9 20.8" fill="none" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.6 21h6.2" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round"/></svg>
+                </span>
+                <div>
+                    <div class="auth-brand-name">TPanel</div>
+                    <div class="auth-brand-sub">Termux panel</div>
+                </div>
             </div>
-            <form id="login-form" class="login-form">
+            <div class="auth-aside-copy">
+                <p class="auth-kicker">Minecraft · Termux</p>
+                <h1 class="auth-headline">Minecraft server control panel.</h1>
+                <p class="auth-copy">Console, files, backups and scheduled tasks for the server running on this device. No agent, no external database.</p>
+            </div>
+            <dl class="auth-facts">
+                <div><dt>Host</dt><dd data-panel-host>localhost:8080</dd></div>
+                <div><dt>Version</dt><dd>2.2</dd></div>
+                <div><dt>Protocol</dt><dd data-panel-protocol>HTTP</dd></div>
+                <div><dt>Session</dt><dd>7 days</dd></div>
+            </dl>
+        </aside>
+
+        <div class="auth-panel">
+            <div class="auth-mobile-brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="currentColor"/><path d="M9 11.2l5.2 4.8L9 20.8" fill="none" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.6 21h6.2" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round"/></svg>
+                </span>
+                <span>TPanel</span>
+            </div>
+
+            <form id="login-form" class="auth-form">
+                <header class="auth-form-head">
+                    <p class="auth-kicker">Local access</p>
+                    <h2 class="auth-title" id="login-title">Sign in</h2>
+                    <p class="auth-sub">Enter the panel password for this device.</p>
+                </header>
+
                 <div class="form-group">
                     <label for="login-password">Password</label>
-                    <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-full" id="login-btn">Sign In</button>
-                <div id="login-error" class="login-error hidden"></div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Setup Screen -->
-    <div id="setup-screen" class="login-screen hidden">
-        <div class="login-container">
-            <div class="login-logo">
-                <div class="login-icon">⛏️</div>
-                <h1>Welcome to TermuxPanel</h1>
-                <p class="login-subtitle">Set up your admin password</p>
-            </div>
-            <form id="setup-form" class="login-form">
-                <div class="form-group">
-                    <label for="setup-password">Create Password</label>
-                    <input type="password" id="setup-password" placeholder="Choose a password" minlength="4" required>
-                </div>
-                <div class="form-group">
-                    <label for="setup-confirm">Confirm Password</label>
-                    <input type="password" id="setup-confirm" placeholder="Confirm your password" minlength="4" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-full">Create Account</button>
-                <div id="setup-error" class="login-error hidden"></div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Main Application -->
-    <div id="app" class="app-layout hidden">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <span class="logo-icon">⛏️</span>
-                    <div class="logo-text">
-                        <span class="logo-title">TermuxPanel</span>
-                        <span class="logo-version">v2.2</span>
+                    <div class="field-wrap">
+                        <input type="password" id="login-password" name="password" autocomplete="current-password" required>
+                        <button type="button" class="field-reveal" data-reveal="login-password" aria-label="Show password" aria-pressed="false" title="Show password">
+                            <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+                        </button>
                     </div>
                 </div>
-                <button class="sidebar-close" id="sidebar-close">✕</button>
+
+                <div id="login-error" class="form-error hidden" role="alert"></div>
+
+                <button type="submit" class="btn btn-primary btn-full auth-submit" id="login-btn">Sign in</button>
+
+                <div class="auth-foot">
+                    <span data-panel-host>localhost:8080</span>
+                    <span>v2.2</span>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- First run -->
+    <section id="setup-screen" class="auth hidden" aria-labelledby="setup-title">
+        <aside class="auth-aside" aria-label="About TPanel">
+            <div class="auth-brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="currentColor"/><path d="M9 11.2l5.2 4.8L9 20.8" fill="none" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.6 21h6.2" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round"/></svg>
+                </span>
+                <div>
+                    <div class="auth-brand-name">TPanel</div>
+                    <div class="auth-brand-sub">Termux panel</div>
+                </div>
+            </div>
+            <div class="auth-aside-copy">
+                <p class="auth-kicker">First run</p>
+                <h1 class="auth-headline">Set the panel password.</h1>
+                <p class="auth-copy">Only the password hash is saved, in <code>config.json</code> on this device. There is no recovery link and no account to reset.</p>
+            </div>
+            <dl class="auth-facts">
+                <div><dt>Host</dt><dd data-panel-host>localhost:8080</dd></div>
+                <div><dt>Version</dt><dd>2.2</dd></div>
+                <div><dt>Storage</dt><dd>config.json</dd></div>
+                <div><dt>Hash</dt><dd>bcrypt</dd></div>
+            </dl>
+        </aside>
+
+        <div class="auth-panel">
+            <div class="auth-mobile-brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="currentColor"/><path d="M9 11.2l5.2 4.8L9 20.8" fill="none" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.6 21h6.2" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round"/></svg>
+                </span>
+                <span>TPanel</span>
             </div>
 
-            <!-- Server Status Badge -->
+            <form id="setup-form" class="auth-form">
+                <header class="auth-form-head">
+                    <p class="auth-kicker">First run</p>
+                    <h2 class="auth-title" id="setup-title">Choose a password</h2>
+                    <p class="auth-sub">Use at least 8 characters. This is the only credential for the panel.</p>
+                </header>
+
+                <div class="form-group">
+                    <label for="setup-password">New password</label>
+                    <div class="field-wrap">
+                        <input type="password" id="setup-password" name="new-password" autocomplete="new-password" minlength="8" required>
+                        <button type="button" class="field-reveal" data-reveal="setup-password" aria-label="Show password" aria-pressed="false" title="Show password">
+                            <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="setup-confirm">Confirm password</label>
+                    <div class="field-wrap">
+                        <input type="password" id="setup-confirm" name="confirm-password" autocomplete="new-password" minlength="8" required>
+                        <button type="button" class="field-reveal" data-reveal="setup-confirm" aria-label="Show password" aria-pressed="false" title="Show password">
+                            <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="setup-error" class="form-error hidden" role="alert"></div>
+
+                <button type="submit" class="btn btn-primary btn-full auth-submit" id="setup-btn">Set password</button>
+
+                <div class="auth-foot">
+                    <span data-panel-host>localhost:8080</span>
+                    <span>v2.2</span>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Main application -->
+    <div id="app" class="app-layout hidden">
+        <aside class="sidebar" id="sidebar" aria-label="Panel navigation">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="currentColor"/><path d="M9 11.2l5.2 4.8L9 20.8" fill="none" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.6 21h6.2" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round"/></svg>
+                    </span>
+                    <div class="sidebar-brand-text">
+                        <span class="sidebar-brand-name">TPanel</span>
+                        <span class="sidebar-brand-sub">Termux · v2.2</span>
+                    </div>
+                </div>
+                <button type="button" class="sidebar-close" id="sidebar-close" aria-label="Close menu">
+                    <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+                </button>
+            </div>
+
             <div class="sidebar-status">
-                <div class="status-indicator" id="sidebar-status-indicator">
-                    <span class="status-dot"></span>
-                    <span class="status-text">Offline</span>
+                <div class="status-chip status-chip--block" id="sidebar-status-indicator" data-status-chip data-state="stopped">
+                    <span class="status-dot" data-status-dot></span>
+                    <span class="status-text" data-status-label>Stopped</span>
                 </div>
             </div>
 
             <nav class="sidebar-nav">
-                <a href="#dashboard" class="nav-item active" data-page="dashboard">
-                    <span class="nav-icon">📊</span>
-                    <span class="nav-label">Dashboard</span>
-                </a>
-                <a href="#console" class="nav-item" data-page="console">
-                    <span class="nav-icon">💻</span>
-                    <span class="nav-label">Console</span>
-                </a>
-                <a href="#files" class="nav-item" data-page="files">
-                    <span class="nav-icon">📁</span>
-                    <span class="nav-label">File Manager</span>
-                </a>
-                <a href="#jars" class="nav-item" data-page="jars">
-                    <span class="nav-icon">☕</span>
-                    <span class="nav-label">JAR Manager</span>
-                </a>
-                <a href="#properties" class="nav-item" data-page="properties">
-                    <span class="nav-icon">⚙️</span>
-                    <span class="nav-label">Server Config</span>
-                </a>
-                <a href="#backups" class="nav-item" data-page="backups">
-                    <span class="nav-icon">💾</span>
-                    <span class="nav-label">Backups</span>
-                </a>
-                <a href="#scheduler" class="nav-item" data-page="scheduler">
-                    <span class="nav-icon">⏰</span>
-                    <span class="nav-label">Scheduler</span>
-                </a>
-                <a href="#settings" class="nav-item" data-page="settings">
-                    <span class="nav-icon">🔧</span>
-                    <span class="nav-label">Settings</span>
-                </a>
+                <div class="nav-group">
+                    <span class="nav-group-label">Control</span>
+                    <a href="#dashboard" class="nav-item active" data-page="dashboard">
+                        <svg class="icon nav-icon" aria-hidden="true"><use href="#i-dashboard"></use></svg>
+                        <span class="nav-label">Dashboard</span>
+                    </a>
+                    <a href="#console" class="nav-item" data-page="console">
+                        <svg class="icon nav-icon" aria-hidden="true"><use href="#i-console"></use></svg>
+                        <span class="nav-label">Console</span>
+                    </a>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-group-label">Server</span>
+                    <a href="#files" class="nav-item" data-page="files">
+                        <svg class="icon nav-icon" aria-hidden="true"><use href="#i-files"></use></svg>
+                        <span class="nav-label">Files</span>
+                    </a>
+                    <a href="#jars" class="nav-item" data-page="jars">
+                        <svg class="icon nav-icon" aria-hidden="true"><use href="#i-jar"></use></svg>
+                        <span class="nav-label">JAR Manager</span>
+                    </a>
+                    <a href="#properties" class="nav-item" data-page="properties">
+                        <svg class="icon nav-icon" aria-hidden="true"><use href="#i-config"></use></svg>
+                        <span class="nav-label">Server Config</span>
+                    </a>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-group-label">Operations</span>
+                    <a href="#backups" class="nav-item" data-page="backups">
+                        <svg class="icon nav-icon" aria-hidden="true"><use href="#i-backups"></use></svg>
+                        <span class="nav-label">Backups</span>
+                    </a>
+                    <a href="#scheduler" class="nav-item" data-page="scheduler">
+                        <svg class="icon nav-icon" aria-hidden="true"><use href="#i-scheduler"></use></svg>
+                        <span class="nav-label">Scheduler</span>
+                    </a>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-group-label">Panel</span>
+                    <a href="#settings" class="nav-item" data-page="settings">
+                        <svg class="icon nav-icon" aria-hidden="true"><use href="#i-settings"></use></svg>
+                        <span class="nav-label">Settings</span>
+                    </a>
+                </div>
             </nav>
 
             <div class="sidebar-footer">
-                <button class="btn btn-ghost btn-sm" id="logout-btn">
-                    <span>🚪</span> Logout
+                <button type="button" class="btn btn-ghost btn-full sidebar-logout" id="logout-btn">
+                    <svg class="icon" aria-hidden="true"><use href="#i-logout"></use></svg>
+                    <span>Log out</span>
                 </button>
+                <span class="sidebar-footnote">Runs locally · no telemetry</span>
             </div>
         </aside>
 
-        <!-- Mobile Header -->
-        <header class="mobile-header" id="mobile-header">
-            <button class="hamburger" id="hamburger">☰</button>
-            <span class="mobile-title">TermuxPanel</span>
-            <div class="mobile-status" id="mobile-status-dot"></div>
-        </header>
-
-        <!-- Main Content Area -->
-        <main class="main-content" id="main-content">
-            <!-- Pages rendered dynamically by app.js -->
-        </main>
-
-        <!-- Overlay for mobile sidebar -->
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-        <!-- Mobile Bottom Nav -->
-        <nav class="mobile-nav">
+        <div class="app-main">
+            <header class="app-topbar">
+                <div class="topbar-head">
+                    <span class="brand-mark brand-mark--sm" aria-hidden="true">
+                        <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="currentColor"/><path d="M9 11.2l5.2 4.8L9 20.8" fill="none" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.6 21h6.2" stroke="#0b0d10" stroke-width="2.4" stroke-linecap="round"/></svg>
+                    </span>
+                    <span class="topbar-title" id="mobile-title">Dashboard</span>
+                </div>
+                <div class="status-chip status-chip--sm" data-status-chip data-state="stopped">
+                    <span class="status-dot" id="mobile-status-dot" data-status-dot></span>
+                    <span data-status-label>Stopped</span>
+                </div>
+            </header>
+
+            <main class="main-content" id="main-content" tabindex="-1">
+                <!-- Pages rendered by app.js -->
+            </main>
+        </div>
+
+        <nav class="mobile-tabs" aria-label="Primary">
             <a href="#dashboard" class="mobile-nav-item active" data-page="dashboard">
-                <span class="mobile-nav-icon">📊</span>
-                <span class="mobile-nav-label">Status</span>
+                <svg class="icon" aria-hidden="true"><use href="#i-dashboard"></use></svg>
+                <span class="mobile-nav-label">Dashboard</span>
             </a>
             <a href="#console" class="mobile-nav-item" data-page="console">
-                <span class="mobile-nav-icon">💻</span>
+                <svg class="icon" aria-hidden="true"><use href="#i-console"></use></svg>
                 <span class="mobile-nav-label">Console</span>
             </a>
             <a href="#files" class="mobile-nav-item" data-page="files">
-                <span class="mobile-nav-icon">📁</span>
+                <svg class="icon" aria-hidden="true"><use href="#i-files"></use></svg>
                 <span class="mobile-nav-label">Files</span>
             </a>
-            <a href="#settings" class="mobile-nav-item" data-page="settings">
-                <span class="mobile-nav-icon">🔧</span>
-                <span class="mobile-nav-label">Settings</span>
+            <a href="#backups" class="mobile-nav-item" data-page="backups">
+                <svg class="icon" aria-hidden="true"><use href="#i-backups"></use></svg>
+                <span class="mobile-nav-label">Backups</span>
             </a>
+            <button type="button" class="mobile-nav-item" id="more-btn" aria-controls="sidebar" aria-expanded="false">
+                <svg class="icon" aria-hidden="true"><use href="#i-more"></use></svg>
+                <span class="mobile-nav-label">More</span>
+            </button>
         </nav>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="toast-container"></div>
+    <div id="toast-container" class="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
 
-    <!-- Modal Container -->
-    <div id="modal-overlay" class="modal-overlay hidden">
-        <div class="modal" id="modal">
+    <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal" id="modal" role="document">
             <div class="modal-header">
                 <h3 id="modal-title"></h3>
-                <button class="modal-close" id="modal-close">✕</button>
+                <button type="button" class="modal-close" id="modal-close" aria-label="Close dialog">
+                    <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+                </button>
             </div>
             <div class="modal-body" id="modal-body"></div>
             <div class="modal-footer" id="modal-footer"></div>

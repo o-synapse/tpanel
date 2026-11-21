@@ -1,100 +1,149 @@
-# TPanel v2.2
+# TPanel
 
-**Modern Minecraft Server Management Panel for Termux**
+A self-hosted web panel for managing a Minecraft server running on Termux, or on any
+small Linux device that is not suited to a full control panel. One Node.js process runs
+on the same machine as the server: no agent, no external database, no build step.
 
-A sleek, feature-rich web panel for managing your Minecraft server directly from your Android device via Termux, or from your Lightweight Linux devices that simply aren't capable of running fully fledged panels. Inspired by Pterodactyl Panel and Crafty Controller.
+## Features
 
----
+- **Dashboard** — server state, uptime and live CPU / memory / disk meters
+- **Console** — live server output plus command input with history
+- **File manager** — browse, edit, upload, download and delete server files
+- **JAR manager** — upload a JAR, or download Paper, Purpur, Vanilla or Fabric
+- **Server config** — grouped editor for `server.properties` with field descriptions
+- **Backups** — create, restore, upload and download server snapshots
+- **Scheduler** — cron jobs that start, stop, restart, back up or run commands
+- **Authentication** — one panel password, hashed with bcrypt, JWT sessions
+- **Phone-first UI** — bottom tab bar, large touch targets, no external assets
 
-## ✨ Features
+## Requirements
 
-- **🖥️ Dashboard** — Server status, resource gauges (CPU/RAM/Disk), quick actions, system info
-- **💻 Console** — Real-time server log viewer with color-coded output and command input (with history)
-- **📁 File Manager** — Browse, edit, upload, download, and delete server files from your browser
-- **☕ JAR Manager** — Upload custom JARs or download Paper, Purpur, Vanilla, or Fabric with version picker
-- **⚙️ Server Config** — Visual editor for `server.properties` with grouped categories and descriptions
-- **💾 Backups** — Create, restore, download, and auto-manage server backups
-- **⏰ Scheduler** — Cron-based task automation (restart, backup, commands, etc.)
-- **🔐 Authentication** — Password-protected access with JWT tokens
-- **📱 Mobile Responsive** — Designed for phone-first use in Termux
-- **🌙 Modern UI** — Dark theme with glassmorphism, smooth animations, and Inter font
+- Termux, or another Linux environment
+- Node.js 18 or newer
+- Java 17 or newer (Java 21 for recent Minecraft releases)
 
----
-
-## 🚀 Setup
-
-### Prerequisites
-- **Termux** (or any Linux environment)
-- **Node.js** (v18+)
-- **Java** (OpenJDK 17+ for modern Minecraft servers)
-
-### Installation
+On Termux:
 
 ```bash
-# Clone the repository
-git clone https://github.com/Orlin12/tpanell.git
-cd termuxpanel
+pkg update
+pkg install nodejs-lts openjdk-17
+```
 
-# Install dependencies
+## Install
+
+```bash
+git clone https://github.com/o-synapse/tpanel.git
+cd tpanel
 npm install
-
-# Start the panel
 node server.js
 ```
 
-### Access
-Open your browser and go to:
-```
-http://localhost:8080
-```
-Or from another device on the same network:
-```
-http://<your-phone-ip>:8080
-```
+`npm start` does the same thing.
 
-### First Time Setup
-1. Open the panel in your browser
-2. Enter the default password: "admin" (you can change this later)
-3. Place your Minecraft server `.jar` in the `minecraft/` directory (or use the JAR Manager to download one)
-4. Click **Start** on the dashboard
+## First run
 
----
+1. Open `http://localhost:8080`.
+2. The panel asks you to create a password. **There is no default password.** Only the
+   bcrypt hash is stored, in `config.json` on the device.
+3. Add a server JAR, either through **JAR manager** or by copying a `.jar` file into
+   `minecraft/`.
+4. Press **Start** on the dashboard.
 
-## 📂 Project Structure
+The panel binds to `0.0.0.0`, so it is reachable from other devices on the same network
+at `http://<device-ip>:8080`.
+
+> The traffic is plain HTTP and the panel can control the machine it runs on. Keep it on
+> a trusted network, or put it behind a reverse proxy with TLS if you need access from
+> outside.
+
+## Configuration
+
+Settings are edited on the **Settings** page and stored in `config.json`.
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `serverName` | `My Minecraft Server` | Name shown in the panel |
+| `port` | `8080` | Port the panel listens on |
+| `javaPath` | `java` | Java binary used to start the server |
+| `minMemory` | `1024M` | JVM minimum heap (`-Xms`) |
+| `maxMemory` | `2048M` | JVM maximum heap (`-Xmx`) |
+| `jvmFlags` | G1GC flags | Extra JVM arguments |
+| `selectedJar` | `server.jar` | JAR used by **Start** |
+| `maxBackups` | `10` | Backups kept before the oldest is removed |
+| `autoStart` | `false` | Start Minecraft when the panel starts |
+| `maxConsoleLines` | `1000` | Console lines kept in memory |
+
+`config.json` is created on first start. It also holds the password hash and the JWT
+signing secret, so keep it out of version control.
+
+## Project layout
 
 ```
 tpanel/
-├── server.js          # Backend (Express + Socket.IO)
-├── package.json       # Dependencies
-├── config.json        # Auto-generated panel config
+├── server.js          # Express + Socket.IO backend
+├── config.json        # Generated configuration (not in version control)
 ├── public/
 │   ├── index.html     # SPA shell
 │   ├── css/style.css  # Design system
 │   └── js/app.js      # Frontend application
-├── minecraft/         # Your server files go here
-├── backups/           # Backup storage
-└── README.md
+├── minecraft/         # Minecraft server files
+└── backups/           # Backup archives
 ```
 
----
+## HTTP API
 
-## ⚙️ Configuration
+Every route except `/api/auth/status`, `/api/auth/setup` and `/api/auth/login` needs an
+`Authorization: Bearer <token>` header. Tokens are valid for seven days.
 
-Settings can be changed from the **Settings** page in the panel, or by editing `config.json`:
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/api/auth/status` | Whether first-time setup is needed |
+| POST | `/api/auth/setup` | Create the first password |
+| POST | `/api/auth/login` | Sign in |
+| POST | `/api/auth/change-password` | Change the password |
+| GET | `/api/server/status` | Server state, uptime and selected JAR |
+| POST | `/api/server/start` | Start the server |
+| POST | `/api/server/stop` | Stop the server |
+| POST | `/api/server/restart` | Restart the server |
+| POST | `/api/server/kill` | Force-stop the server |
+| POST | `/api/server/command` | Send a console command |
+| GET | `/api/server/console` | Buffered console output |
+| GET | `/api/stats` | CPU, memory and disk usage |
+| GET | `/api/config` | Read panel settings |
+| PUT | `/api/config` | Update panel settings |
+| GET | `/api/properties` | Read `server.properties` |
+| PUT | `/api/properties` | Write `server.properties` |
+| GET | `/api/files` | List a directory |
+| GET | `/api/files/read` | Read one file |
+| PUT | `/api/files/write` | Write one file |
+| POST | `/api/files/upload` | Upload files |
+| GET | `/api/files/download` | Download a file |
+| POST | `/api/files/mkdir` | Create a directory |
+| POST | `/api/files/rename` | Rename a file |
+| DELETE | `/api/files/delete` | Delete a file |
+| DELETE | `/api/files/delete-all` | Delete everything in the server folder |
+| GET | `/api/jars` | List server JARs |
+| POST | `/api/jars/upload` | Upload a JAR |
+| POST | `/api/jars/select` | Choose the active JAR |
+| POST | `/api/jars/download` | Download a server JAR |
+| GET | `/api/jars/versions/:type` | Available versions for a server type |
+| DELETE | `/api/jars/:name` | Delete a JAR |
+| GET | `/api/backups` | List backups |
+| POST | `/api/backups/create` | Create a backup |
+| POST | `/api/backups/restore/:name` | Restore a backup |
+| POST | `/api/backups/upload` | Upload a backup |
+| GET | `/api/backups/download/:name` | Download a backup |
+| DELETE | `/api/backups/:name` | Delete a backup |
+| GET | `/api/schedules` | List scheduled tasks |
+| POST | `/api/schedules` | Create a scheduled task |
+| PUT | `/api/schedules/:id` | Update a scheduled task |
+| DELETE | `/api/schedules/:id` | Delete a scheduled task |
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `serverName` | My Minecraft Server | Display name |
-| `port` | 8080 | Panel web port |
-| `javaPath` | java | Path to Java binary |
-| `minMemory` | 1024M | JVM min heap (-Xms) |
-| `maxMemory` | 2048M | JVM max heap (-Xmx) |
-| `jvmFlags` | G1GC flags | Additional JVM arguments |
-| `maxBackups` | 10 | Auto-delete oldest when exceeded |
-| `autoStart` | false | Start MC server with panel |
+## Development
 
----
+The frontend is plain HTML, CSS and JavaScript — there is no build step and no runtime
+dependencies beyond the ones in `package.json`. Edit `public/` and reload the page.
 
-## 📝 License
+## License
 
 ISC
